@@ -1,0 +1,88 @@
+{
+  "brand_kit": {
+    "brand_name": "SipSense",
+    "product_name": "ThermoPulse Smart Travel Mug",
+    "tagline": "Your perfect sip, all day long.",
+    "voice_adjectives": ["smart", "reliable", "warm", "minimalist"],
+    "voice_summary": "Thoughtful, precise, and encouraging tone for modern professionals and travelers who appreciate elevated daily essentials.",
+    "example_lines": [
+      "Precision heating meets uncompromised durability.",
+      "Never settle for lukewarm coffee again.",
+      "Engineered for the rush hour commuter and the summit trail."
+    ],
+    "product_features": [
+      "App-controlled precision temperature between 120°F and 145°F",
+      "12-hour rechargeable built-in thermal battery",
+      "Leak-proof 360-degree magnetic sip lid",
+      "Scratch-resistant ceramic interior that preserves pure beverage flavor",
+      "IPX7 waterproof submersible design for easy hand-washing"
+    ],
+    "banned_terms": [
+      "cheap",
+      "game-changer",
+      "miracle",
+      "revolutionary",
+      "disrupt",
+      "hack"
+    ],
+    "channel_rules": {
+      "post": {
+        "max_chars": 280,
+        "hashtags_min": 1,
+        "hashtags_max": 3
+      },
+      "email": {
+        "subject_max_chars": 60,
+        "body_min_words": 75,
+        "body_max_words": 150
+      }
+    }
+  },
+  "personas": [
+    {
+      "id": "commuter",
+      "name": "Alex Chen",
+      "role": "Urban Daily Commuter",
+      "pain_points": [
+        "Coffee turns lukewarm during 45-minute stop-and-go morning traffic",
+        "Mugs leak coffee onto work attire and laptop bags",
+        "Difficulty cleaning travel mug lids thoroughly"
+      ],
+      "motivations": [
+        "Reliable morning routine without coffee spills",
+        "Sipping hot coffee at the exact desired temperature upon arriving at the office"
+      ],
+      "preferred_tone": "Practical, fast-paced, and reassuring"
+    },
+    {
+      "id": "freelancer",
+      "name": "Jordan Taylor",
+      "role": "Remote Software Engineer & Freelancer",
+      "pain_points": [
+        "Beverage gets forgotten and goes stone cold during deep coding sprints",
+        "Cluttered desk space from reheating mugs in the microwave",
+        "Metallic-tasting coffee from low-grade stainless steel tumblers"
+      ],
+      "motivations": [
+        "Uninterrupted workflow and peak focus during deep work sessions",
+        "Clean, minimalist aesthetic that complements workspace gear"
+      ],
+      "preferred_tone": "Smart, focused, and design-conscious"
+    },
+    {
+      "id": "adventurer",
+      "name": "Samira Patel",
+      "role": "Weekend Hiker & Outdoor Trail Enthusiast",
+      "pain_points": [
+        "Mugs lose heat within an hour on chilly mountain trails",
+        "Fragile drinkware dents or leaks inside backpacks on rough terrain",
+        "Bulky chargers or docks that cannot be taken outdoors"
+      ],
+      "motivations": [
+        "Long-lasting hot tea or soup at the peak after a 4-hour hike",
+        "Rugged, dependable gear that withstands drops and outdoor elements"
+      ],
+      "preferred_tone": "Inspiring, rugged, and adventurous"
+    }
+  ]
+}
