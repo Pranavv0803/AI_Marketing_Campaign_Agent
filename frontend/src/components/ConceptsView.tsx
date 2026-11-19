@@ -23,7 +23,7 @@ export const ConceptsView: React.FC<ConceptsViewProps> = ({
   isLoading,
 }) => {
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white border border-slate-200 rounded-xl p-5 shadow-sm gap-4">
         <div>

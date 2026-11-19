@@ -86,8 +86,8 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
               <User className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">{persona.name}</h3>
-              <p className="text-[11px] text-slate-500">{persona.role}</p>
+              <h3 className="text-sm font-bold text-slate-900">{persona.name || 'Unnamed Persona'}</h3>
+              <p className="text-[11px] text-slate-500">{persona.role || 'Unspecified Role'}</p>
             </div>
           </div>
           <span className="text-[10px] font-mono px-2 py-0.5 bg-slate-100 rounded text-slate-600">
@@ -106,6 +106,17 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
 
         {/* Persona Details Editable Inputs */}
         <div className="mt-3 space-y-2.5">
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-500 mb-0.5">Persona Name</label>
+            <input
+              type="text"
+              value={persona.name}
+              onChange={(e) => updateField('name', e.target.value)}
+              placeholder="e.g. Alex Chen"
+              className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none font-medium text-slate-900"
+            />
+          </div>
+
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 mb-0.5">Role Description</label>
             <input
@@ -150,11 +161,10 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
             {persona.pain_points.map((pt, idx) => (
               <li
                 key={idx}
-                className={`flex items-center justify-between px-2.5 py-1.5 rounded text-xs border ${
-                  idx === 0
+                className={`flex items-center justify-between px-2.5 py-1.5 rounded text-xs border ${idx === 0
                     ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950 font-medium'
                     : 'bg-slate-50 border-slate-200 text-slate-700'
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-1.5 overflow-hidden">
                   <span className="text-[10px] font-bold text-slate-400">#{idx + 1}</span>

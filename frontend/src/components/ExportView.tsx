@@ -33,7 +33,7 @@ export const ExportView: React.FC<ExportViewProps> = ({ campaign, onBackToCampai
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header and Download Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white border border-slate-200 rounded-xl p-6 shadow-sm gap-4">
         <div>

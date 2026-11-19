@@ -60,7 +60,7 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
             className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold inline-flex items-center shadow-sm disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 mr-1.5 ${isRegeneratingAll ? 'animate-spin' : ''}`} />
-            Regenerate All (6 Assets)
+            Regenerate All ({personas.length * 2} Assets)
           </button>
           <button
             type="button"
@@ -73,8 +73,16 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
         </div>
       </div>
 
-      {/* 3 Columns Side-by-Side View */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Dynamic Columns Side-by-Side View */}
+      <div className={`grid gap-6 ${
+        personas.length === 1
+          ? 'grid-cols-1 max-w-xl mx-auto'
+          : personas.length === 2
+          ? 'grid-cols-1 md:grid-cols-2'
+          : personas.length === 3
+          ? 'grid-cols-1 lg:grid-cols-3'
+          : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+      }`}>
         {personas.map((persona) => {
           const postPiece = getPiece(persona.id, 'post');
           const emailPiece = getPiece(persona.id, 'email');
