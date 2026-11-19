@@ -1,0 +1,294 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AI Marketing Campaign Generator API",
+    "version": "1.0.0",
+    "description": "Stateless REST API for generating multi-audience marketing campaigns with deterministic brand rule checking, qualitative judging, automatic remediation, and dual LLM provider fallback."
+  },
+  "paths": {
+    "/api/sample": {
+      "get": {
+        "summary": "Load Synthetic Sample Data",
+        "operationId": "getSampleData",
+        "responses": {
+          "200": {
+            "description": "Default SipSense smart travel mug brand kit and 3 customer personas",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SampleDataResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/concepts": {
+      "post": {
+        "summary": "Generate 3 Campaign Concepts",
+        "operationId": "generateConcepts",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ConceptsRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exactly three distinct vetted campaign concepts",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ConceptsResponse" }
+              }
+            }
+          },
+          "422": { "description": "Validation error or generation rule failure" }
+        }
+      }
+    },
+    "/api/piece": {
+      "post": {
+        "summary": "Generate or Remediate a Single Persona Channel Piece",
+        "operationId": "generateOrFixPiece",
+        "description": "Executes generation pipeline for one persona and channel: write -> deterministic rules -> LLM judge -> optional auto-fix -> re-check. Returns final piece and diagnostics.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PieceRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completed piece evaluation with rule checks, score, and status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PieceResult" }
+              }
+            }
+          },
+          "422": { "description": "Invalid input schema" },
+          "503": { "description": "Both LLM providers unavailable (suggests retry or mock mode)" }
+        }
+      }
+    },
+    "/api/export": {
+      "post": {
+        "summary": "Export Campaign as Markdown or JSON",
+        "operationId": "exportCampaign",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExportRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Formatted export document ready for download",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExportResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Health and LLM Provider Status",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Service reachability across OpenAI, Gemini fallback, and mock mode",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HealthResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SampleDataResponse": {
+        "type": "object",
+        "required": ["brand_kit", "personas"],
+        "properties": {
+          "brand_kit": { "$ref": "#/components/schemas/BrandKit" },
+          "personas": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Persona" },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        }
+      },
+      "BrandKit": {
+        "type": "object",
+        "required": ["brand_name", "product_name", "tagline", "voice_adjectives", "voice_summary", "example_lines", "product_features", "banned_terms", "channel_rules"],
+        "properties": {
+          "brand_name": { "type": "string" },
+          "product_name": { "type": "string" },
+          "tagline": { "type": "string" },
+          "voice_adjectives": { "type": "array", "items": { "type": "string" } },
+          "voice_summary": { "type": "string" },
+          "example_lines": { "type": "array", "items": { "type": "string" } },
+          "product_features": { "type": "array", "items": { "type": "string" } },
+          "banned_terms": { "type": "array", "items": { "type": "string" } },
+          "channel_rules": { "$ref": "#/components/schemas/ChannelRules" }
+        }
+      },
+      "ChannelRules": {
+        "type": "object",
+        "required": ["post", "email"],
+        "properties": {
+          "post": {
+            "type": "object",
+            "required": ["max_chars", "hashtags_min", "hashtags_max"],
+            "properties": {
+              "max_chars": { "type": "integer", "default": 280 },
+              "hashtags_min": { "type": "integer", "default": 1 },
+              "hashtags_max": { "type": "integer", "default": 3 }
+            }
+          },
+          "email": {
+            "type": "object",
+            "required": ["subject_max_chars", "body_min_words", "body_max_words"],
+            "properties": {
+              "subject_max_chars": { "type": "integer", "default": 60 },
+              "body_min_words": { "type": "integer", "default": 75 },
+              "body_max_words": { "type": "integer", "default": 150 }
+            }
+          }
+        }
+      },
+      "Persona": {
+        "type": "object",
+        "required": ["id", "name", "role", "pain_points", "motivations", "preferred_tone"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "pain_points": { "type": "array", "items": { "type": "string" } },
+          "motivations": { "type": "array", "items": { "type": "string" } },
+          "preferred_tone": { "type": "string" }
+        }
+      },
+      "Concept": {
+        "type": "object",
+        "required": ["name", "key_message", "hook"],
+        "properties": {
+          "name": { "type": "string" },
+          "key_message": { "type": "string" },
+          "hook": { "type": "string" }
+        }
+      },
+      "ConceptsRequest": {
+        "type": "object",
+        "required": ["brand_kit", "personas"],
+        "properties": {
+          "brand_kit": { "$ref": "#/components/schemas/BrandKit" },
+          "personas": { "type": "array", "items": { "$ref": "#/components/schemas/Persona" } }
+        }
+      },
+      "ConceptsResponse": {
+        "type": "object",
+        "required": ["concepts"],
+        "properties": {
+          "concepts": { "type": "array", "items": { "$ref": "#/components/schemas/Concept" }, "minItems": 3, "maxItems": 3 }
+        }
+      },
+      "PieceRequest": {
+        "type": "object",
+        "required": ["brand_kit", "persona", "concept", "channel"],
+        "properties": {
+          "brand_kit": { "$ref": "#/components/schemas/BrandKit" },
+          "persona": { "$ref": "#/components/schemas/Persona" },
+          "avoid_pain_points": { "type": "array", "items": { "type": "string" } },
+          "concept": { "$ref": "#/components/schemas/Concept" },
+          "channel": { "type": "string", "enum": ["post", "email"] },
+          "mode": { "type": "string", "enum": ["write", "fix"], "default": "write" },
+          "original_piece": { "type": "string" },
+          "failures": { "type": "array", "items": { "$ref": "#/components/schemas/RuleResult" } }
+        }
+      },
+      "RuleResult": {
+        "type": "object",
+        "required": ["rule_id", "passed", "detail"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "passed": { "type": "boolean" },
+          "detail": { "type": "string" },
+          "matched_text": { "type": "string", "nullable": true }
+        }
+      },
+      "JudgeResult": {
+        "type": "object",
+        "required": ["reason", "score"],
+        "properties": {
+          "reason": { "type": "string" },
+          "score": { "type": "integer", "minimum": 1, "maximum": 5 }
+        }
+      },
+      "PieceResult": {
+        "type": "object",
+        "required": ["persona_id", "channel", "assembled_text", "rule_results", "judge", "status", "provider"],
+        "properties": {
+          "persona_id": { "type": "string" },
+          "channel": { "type": "string", "enum": ["post", "email"] },
+          "assembled_text": { "type": "string" },
+          "rule_results": { "type": "array", "items": { "$ref": "#/components/schemas/RuleResult" } },
+          "judge": { "$ref": "#/components/schemas/JudgeResult" },
+          "status": { "type": "string", "enum": ["pass", "fixed", "failing"] },
+          "provider": { "type": "string" }
+        }
+      },
+      "Campaign": {
+        "type": "object",
+        "required": ["brand_kit", "personas", "concept", "pieces"],
+        "properties": {
+          "brand_kit": { "$ref": "#/components/schemas/BrandKit" },
+          "personas": { "type": "array", "items": { "$ref": "#/components/schemas/Persona" } },
+          "concept": { "$ref": "#/components/schemas/Concept" },
+          "pieces": { "type": "array", "items": { "$ref": "#/components/schemas/PieceResult" } }
+        }
+      },
+      "ExportRequest": {
+        "type": "object",
+        "required": ["campaign", "format"],
+        "properties": {
+          "campaign": { "$ref": "#/components/schemas/Campaign" },
+          "format": { "type": "string", "enum": ["markdown", "json"] }
+        }
+      },
+      "ExportResponse": {
+        "type": "object",
+        "required": ["filename", "content", "mime_type"],
+        "properties": {
+          "filename": { "type": "string" },
+          "content": { "type": "string" },
+          "mime_type": { "type": "string" }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status", "primary_provider", "primary_reachable", "fallback_provider", "fallback_reachable", "mock_mode"],
+        "properties": {
+          "status": { "type": "string", "enum": ["ok", "degraded", "error"] },
+          "primary_provider": { "type": "string" },
+          "primary_reachable": { "type": "boolean" },
+          "fallback_provider": { "type": "string" },
+          "fallback_reachable": { "type": "boolean" },
+          "mock_mode": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
