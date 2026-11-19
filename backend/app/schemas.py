@@ -100,17 +100,17 @@ class PieceResult(BaseModel):
 
 class SampleDataResponse(BaseModel):
     brand_kit: BrandKit
-    personas: list[Persona] = Field(..., min_length=3, max_length=3)
+    personas: list[Persona] = Field(..., min_length=1, max_length=6)
 
 
 class ConceptsRequest(BaseModel):
     brand_kit: BrandKit
-    personas: list[Persona] = Field(..., min_length=3, max_length=3)
+    personas: list[Persona] = Field(..., min_length=1, max_length=6)
     mock_mode: bool | None = Field(default=None, description="Explicitly force mock or live OpenAI mode")
 
 
 class ConceptsResponse(BaseModel):
-    concepts: list[Concept] = Field(..., min_length=3, max_length=3)
+    concepts: list[Concept] = Field(..., min_length=1, max_length=5)
 
 
 class PieceRequest(BaseModel):
