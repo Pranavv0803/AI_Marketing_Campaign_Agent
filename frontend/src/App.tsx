@@ -129,12 +129,19 @@ export const App: React.FC = () => {
       setCurrentStep(3);
       setMaxStepUnlocked((prev) => Math.max(prev, 3));
 
-      // Resolve avoid angles per persona
-      const allLeadAngles = personas.map((p) => p.pain_points[0] || '');
+      // Resolve distinct lead angles per persona to avoid collisions
+      const usedAngles = new Set<string>();
+      const resolvedAngles = personas.map((p) => {
+        const found = p.pain_points.find((pt) => pt.trim() && !usedAngles.has(pt.trim()));
+        const chosen = found ? found.trim() : (p.pain_points[0]?.trim() || `Demands and lifestyle of ${p.name}`);
+        usedAngles.add(chosen);
+        return chosen;
+      });
 
       const calls: Promise<PieceResult>[] = [];
-      personas.forEach((persona) => {
-        const avoids = allLeadAngles.filter((a) => a !== (persona.pain_points[0] || ''));
+      personas.forEach((persona, idx) => {
+        const myLead = resolvedAngles[idx];
+        const avoids = resolvedAngles.filter((a) => a !== myLead);
         // 1 social post
         calls.push(generatePiece(brandKit, persona, avoids, activeConcept, 'post', activeMock));
         // 1 email

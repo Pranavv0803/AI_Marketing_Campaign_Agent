@@ -208,6 +208,13 @@ def check_social_post_rules(
     return assembled, results
 
 
+def clean_email_subject(subject: str) -> str:
+    """Strips any redundant model-generated 'Subject:' prefix."""
+    if not subject:
+        return ""
+    return re.sub(r"^(?:subject\s*:\s*)+", "", subject.strip(), flags=re.IGNORECASE).strip()
+
+
 def check_email_rules(
     email: EmailOutput,
     rules: EmailRules,
@@ -217,7 +224,7 @@ def check_email_rules(
     Validates an email asset against channel rules and banned terms.
     Returns (assembled_text, list_of_rule_results).
     """
-    subject = email.subject.strip()
+    subject = clean_email_subject(email.subject)
     body = email.body.strip()
     assembled = f"Subject: {subject}\n\n{body}"
     results: list[RuleResult] = []

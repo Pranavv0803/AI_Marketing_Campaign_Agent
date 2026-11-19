@@ -23,6 +23,23 @@ export const SetupView: React.FC<SetupViewProps> = ({
   onProceedToConcepts,
   isLoading,
 }) => {
+  const hasInvertedLimits =
+    brandKit.channel_rules.post.hashtags_min > brandKit.channel_rules.post.hashtags_max ||
+    brandKit.channel_rules.email.body_min_words > brandKit.channel_rules.email.body_max_words ||
+    brandKit.channel_rules.post.max_chars <= 0 ||
+    brandKit.channel_rules.email.subject_max_chars <= 0;
+
+  const hasEmptyBrandData =
+    !brandKit.brand_name.trim() ||
+    !brandKit.product_name.trim() ||
+    brandKit.product_features.length === 0;
+
+  const hasInvalidPersonas =
+    personas.length < 3 ||
+    personas.some((p) => !p.name.trim() || p.pain_points.length === 0);
+
+  const isFormValid = !hasInvertedLimits && !hasEmptyBrandData && !hasInvalidPersonas;
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Top Banner & Quick Actions */}
@@ -49,8 +66,21 @@ export const SetupView: React.FC<SetupViewProps> = ({
           <button
             type="button"
             onClick={onProceedToConcepts}
-            disabled={isLoading}
-            className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold inline-flex items-center shadow-sm transition-colors"
+            disabled={isLoading || !isFormValid}
+            title={
+              !isFormValid
+                ? hasInvertedLimits
+                  ? 'Fix channel limit warnings before continuing'
+                  : hasEmptyBrandData
+                  ? 'Provide Brand Name, Product Name, and at least 1 feature'
+                  : 'Ensure all 3 personas have a name and at least 1 pain point'
+                : 'Generate 3 creative campaign concepts'
+            }
+            className={`px-5 py-2 text-white rounded-lg text-xs font-semibold inline-flex items-center shadow-sm transition-colors ${
+              isFormValid && !isLoading
+                ? 'bg-emerald-600 hover:bg-emerald-700 cursor-pointer'
+                : 'bg-slate-400 cursor-not-allowed opacity-60'
+            }`}
           >
             <span>Next: Concepts</span>
             <ArrowRight className="w-4 h-4 ml-1.5" />

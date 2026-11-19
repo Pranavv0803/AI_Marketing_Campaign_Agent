@@ -183,3 +183,50 @@ def test_concept_banned_terms():
 
     res_dirty = check_concept_rules(dirty_concept, banned)
     assert any(not r.passed and "miracle" in r.detail.lower() for r in res_dirty)
+
+
+# ============================================================================
+# 5. Edge Case Tests
+# ============================================================================
+
+def test_clean_email_subject_prefix():
+    from backend.app.rules import clean_email_subject
+    assert clean_email_subject("Subject: Never drink cold coffee") == "Never drink cold coffee"
+    assert clean_email_subject("subject:   Hot tea on the trail") == "Hot tea on the trail"
+    assert clean_email_subject("SUBJECT: Keep your coffee hot") == "Keep your coffee hot"
+    assert clean_email_subject("A great subject without prefix") == "A great subject without prefix"
+
+
+def test_zero_hashtags_configuration():
+    rules = PostRules(max_chars=100, hashtags_min=0, hashtags_max=0)
+    post = PostOutput(body="Clean post without any hashtags.", hashtags=[])
+    assembled, results = check_social_post_rules(post, rules, [])
+    assert count_characters(assembled) == len("Clean post without any hashtags.")
+    assert any(r.rule_id == "post_hashtag_count" and r.passed for r in results)
+
+
+def test_sanitize_filename():
+    from backend.app.export import sanitize_filename
+    assert sanitize_filename("SipSense: ThermoPulse / Edition * 2026") == "sipsense-thermopulse-edition-2026"
+    assert sanitize_filename('Dangerous "File" <Name>?') == "dangerous-file-name"
+    assert sanitize_filename("   ") == "marketing-campaign"
+
+
+def test_persona_angle_collision_resolution():
+    from backend.app.schemas import Persona
+    from backend.app.steps import resolve_persona_angles
+
+    # 3 personas with the EXACT same primary pain point
+    p1 = Persona(id="p1", name="Alice", role="Commuter", pain_points=["Cold coffee"], motivations=["Speed"], preferred_tone="Crisp")
+    p2 = Persona(id="p2", name="Bob", role="Freelancer", pain_points=["Cold coffee"], motivations=["Focus"], preferred_tone="Warm")
+    p3 = Persona(id="p3", name="Charlie", role="Hiker", pain_points=["Cold coffee"], motivations=["Durability"], preferred_tone="Rugged")
+
+    angle_map = resolve_persona_angles([p1, p2, p3])
+    angles = [angle_map[pid][0] for pid in ["p1", "p2", "p3"]]
+
+    # All 3 lead angles must be completely unique
+    assert len(set(angles)) == 3
+    assert angles[0] == "Cold coffee"
+    assert "Commuter" not in angles[0]
+    assert "Freelancer" in angles[1]
+    assert "Hiker" in angles[2]

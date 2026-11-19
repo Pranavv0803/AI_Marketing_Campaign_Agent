@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 class PostRules(BaseModel):
     max_chars: int = Field(default=280, ge=10, description="Maximum characters allowed in a social post, including hashtags")
     hashtags_min: int = Field(default=1, ge=0, description="Minimum number of hashtags required")
-    hashtags_max: int = Field(default=3, ge=1, description="Maximum number of hashtags allowed")
+    hashtags_max: int = Field(default=3, ge=0, description="Maximum number of hashtags allowed")
 
 
 class EmailRules(BaseModel):

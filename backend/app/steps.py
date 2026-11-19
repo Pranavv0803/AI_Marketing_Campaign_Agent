@@ -36,7 +36,8 @@ def resolve_persona_angles(personas: list[Persona]) -> dict[str, tuple[str, list
                 used_leads.add(cleaned)
                 break
         if not chosen_lead:
-            chosen_lead = p.pain_points[0].strip() if p.pain_points else f"Focus area for {p.name}"
+            chosen_lead = f"Demands and daily routine of {p.name} as a {p.role}"
+            used_leads.add(chosen_lead)
         assigned_leads[p.id] = chosen_lead
 
     # Compute avoid lists

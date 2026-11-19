@@ -12,6 +12,19 @@ import {
 
 const API_BASE = '/api';
 
+async function extractErrorMessage(res: Response, defaultMessage: string): Promise<string> {
+  try {
+    const data = await res.json();
+    if (data && data.detail) {
+      return typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+    }
+    return JSON.stringify(data);
+  } catch {
+    const text = await res.text().catch(() => '');
+    return text.trim() || `HTTP ${res.status}: ${res.statusText || defaultMessage}`;
+  }
+}
+
 export async function fetchHealth(): Promise<HealthResponse> {
   const res = await fetch(`${API_BASE}/health`);
   if (!res.ok) throw new Error('Health check failed');
@@ -38,8 +51,8 @@ export async function generateConcepts(
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Concept generation failed' }));
-    throw new Error(err.detail || 'Concept generation failed');
+    const errText = await extractErrorMessage(res, 'Concept generation failed');
+    throw new Error(errText);
   }
   return res.json();
 }
@@ -67,8 +80,8 @@ export async function generatePiece(
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Piece generation failed' }));
-    throw new Error(err.detail || 'Piece generation failed');
+    const errText = await extractErrorMessage(res, 'Piece generation failed');
+    throw new Error(errText);
   }
   return res.json();
 }
@@ -83,8 +96,8 @@ export async function exportCampaign(
     body: JSON.stringify({ campaign, format }),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Export failed' }));
-    throw new Error(err.detail || 'Export failed');
+    const errText = await extractErrorMessage(res, 'Export failed');
+    throw new Error(errText);
   }
   return res.json();
 }

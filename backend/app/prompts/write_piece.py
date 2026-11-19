@@ -40,12 +40,16 @@ def build_write_piece_prompt(
         min_tags = brand_kit.channel_rules.post.hashtags_min
         max_tags = brand_kit.channel_rules.post.hashtags_max
 
-        sample_tags_count = max(1, min_tags)
-        sample_tags_json = json.dumps([f"Tag{i+1}" for i in range(sample_tags_count)])
-
-        if min_tags == max_tags:
+        if max_tags == 0:
+            sample_tags_json = "[]"
+            hashtag_req = "EXACTLY 0 hashtags. You MUST return an empty array [] for 'hashtags'. Do NOT output any hashtags."
+        elif min_tags == max_tags:
+            sample_tags_count = min_tags
+            sample_tags_json = json.dumps([f"Tag{i+1}" for i in range(sample_tags_count)])
             hashtag_req = f"EXACTLY {min_tags} relevant hashtag(s). You MUST return an array with EXACTLY {min_tags} element(s)."
         else:
+            sample_tags_count = max(1, min_tags)
+            sample_tags_json = json.dumps([f"Tag{i+1}" for i in range(sample_tags_count)])
             hashtag_req = f"Between {min_tags} and {max_tags} relevant hashtags (inclusive). Do NOT provide fewer than {min_tags} or more than {max_tags}."
 
         channel_instruction = f"""CHANNEL CONSTRAINTS (Social Post):

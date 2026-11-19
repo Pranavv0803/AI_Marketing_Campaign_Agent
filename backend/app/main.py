@@ -77,12 +77,20 @@ async def generate_piece(request: PieceRequest) -> PieceResult:
     write -> deterministic rules -> judge -> conditional auto-fix -> re-check.
     """
     try:
-        # Determine the primary lead pain point for this persona
-        lead_pain_point = (
-            request.persona.pain_points[0]
-            if request.persona.pain_points
-            else f"Focus area for {request.persona.name}"
-        )
+        # Determine the primary lead pain point for this persona, avoiding collision with peers
+        lead_pain_point = None
+        for pt in request.persona.pain_points:
+            cleaned = pt.strip()
+            if cleaned and cleaned not in request.avoid_pain_points:
+                lead_pain_point = cleaned
+                break
+
+        if not lead_pain_point:
+            lead_pain_point = (
+                request.persona.pain_points[0].strip()
+                if request.persona.pain_points
+                else f"Demands and daily routine of {request.persona.name} as a {request.persona.role}"
+            )
 
         return await run_piece(
             brand_kit=request.brand_kit,

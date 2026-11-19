@@ -1,5 +1,12 @@
+import re
 import json
 from backend.app.schemas import Campaign, ExportResponse
+
+
+def sanitize_filename(name: str) -> str:
+    """Removes filesystem-unsafe characters from generated file names."""
+    slug = re.sub(r"[^a-zA-Z0-9_\-]+", "-", name.strip().lower()).strip("-")
+    return slug or "marketing-campaign"
 
 
 def generate_markdown_export(campaign: Campaign) -> str:
@@ -83,7 +90,7 @@ def generate_markdown_export(campaign: Campaign) -> str:
 
 def export_campaign_data(campaign: Campaign, format_type: str) -> ExportResponse:
     """Exports the campaign as Markdown or JSON."""
-    brand_slug = campaign.brand_kit.brand_name.lower().replace(" ", "-")
+    brand_slug = sanitize_filename(campaign.brand_kit.brand_name)
 
     if format_type.lower() == "json":
         data = campaign.model_dump(mode="json")

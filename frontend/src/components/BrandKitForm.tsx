@@ -398,6 +398,27 @@ export const BrandKitForm: React.FC<BrandKitFormProps> = ({ brandKit, onChange }
             />
           </div>
         </div>
+
+        {/* Validation warnings for inverted limits */}
+        {(brandKit.channel_rules.post.hashtags_min > brandKit.channel_rules.post.hashtags_max ||
+          brandKit.channel_rules.email.body_min_words > brandKit.channel_rules.email.body_max_words ||
+          brandKit.channel_rules.post.max_chars <= 0 ||
+          brandKit.channel_rules.email.subject_max_chars <= 0) && (
+          <div className="mt-3 p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-start gap-1.5">
+            <span className="font-bold shrink-0">⚠️ Configuration Warning:</span>
+            <div className="space-y-0.5">
+              {brandKit.channel_rules.post.hashtags_min > brandKit.channel_rules.post.hashtags_max && (
+                <div>Min hashtags ({brandKit.channel_rules.post.hashtags_min}) cannot exceed Max hashtags ({brandKit.channel_rules.post.hashtags_max}).</div>
+              )}
+              {brandKit.channel_rules.email.body_min_words > brandKit.channel_rules.email.body_max_words && (
+                <div>Email Min words ({brandKit.channel_rules.email.body_min_words}) cannot exceed Max words ({brandKit.channel_rules.email.body_max_words}).</div>
+              )}
+              {(brandKit.channel_rules.post.max_chars <= 0 || brandKit.channel_rules.email.subject_max_chars <= 0) && (
+                <div>Character limits must be greater than 0.</div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
