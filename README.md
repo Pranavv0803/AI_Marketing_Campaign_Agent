@@ -17,43 +17,13 @@ An intelligent, multi-channel marketing campaign generator built for hackathons 
 5. **No Heavyweight Frameworks**: Pure, inspectable Python functions with explicit schemas; no LangChain, LangGraph, or CrewAI abstractions.
 
 ---
+## 🏗️ System Architecture
 
-## Repository Layout
+The application follows a layered architecture consisting of the frontend, API layer, pipeline orchestrator, validation engines, and campaign output.
 
-```text
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI app, CORS, REST routes
-│   │   ├── config.py            # Environment settings (.env)
-│   │   ├── schemas.py           # Pydantic v2 models
-│   │   ├── llm.py               # Dual-provider client, fallback routing, mock mode
-│   │   ├── prompts/             # Isolated single-step prompt templates
-│   │   │   ├── concepts.py      # Concepts generation prompt
-│   │   │   ├── write_piece.py   # Piece writing prompt with safety margin
-│   │   │   ├── judge.py         # Brand voice scoring rubric prompt
-│   │   │   └── autofix.py       # Rule remediation prompt
-│   │   ├── steps.py             # Step functions (concepts, write, judge, fix)
-│   │   ├── rules.py             # Deterministic rule engine (boundaries, Unicode, regex)
-│   │   ├── pipeline.py          # run_piece orchestrator
-│   │   └── export.py            # Markdown and JSON export generators
-│   └── tests/
-│       ├── test_rules.py        # Boundary, Unicode, and banned-word unit tests
-│       └── test_llm.py          # Wrapper, fallback, and mock mode tests
-├── data/
-│   └── sample.json              # SipSense smart travel mug & 3 customer personas
-├── frontend/
-│   ├── src/
-│   │   ├── api/client.ts        # Typed fetch client
-│   │   ├── components/          # Stepper, BrandKitForm, PersonaCard, PieceCard, ExportView
-│   │   ├── types/index.ts       # TypeScript interfaces matching backend schemas
-│   │   ├── App.tsx              # Root state manager & wizard controller
-│   │   └── index.css            # Tailwind directives & projector typography
-│   ├── package.json
-│   └── vite.config.ts
-├── .env.example                 # Sanitized environment template
-├── .gitignore                   # Ignores .env, .venv, node_modules, build outputs
-└── README.md
-```
+<p align="center">
+  <img src="docs/images/architecture.png" alt="System Architecture" width="90%">
+</p>
 
 ---
 
